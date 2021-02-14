@@ -44,7 +44,7 @@ const selectItem = (event, img) => {
   if (item === -1) {
     sliders.push(img);
   } else {
-    alert('Already added this image')
+      sliders.splice(item, 1);
   }
 }
 var timer
@@ -67,7 +67,11 @@ const createSlider = () => {
   document.querySelector('.main').style.display = 'block';
   // hide image aria
   imagesArea.style.display = 'none';
-  const duration = document.getElementById('create-slider').value || 1000;
+  const duration = document.getElementById('duration').value || 1000;
+  if(duration < 0) {
+    alert("Duration can't be negative")
+    return;
+  }
   sliders.forEach(slide => {
     let item = document.createElement('div')
     item.className = "slider-item";
@@ -81,7 +85,6 @@ const createSlider = () => {
     slideIndex++;
     changeSlide(slideIndex);
   }, duration);
-
 }
 
 // change slider index 
