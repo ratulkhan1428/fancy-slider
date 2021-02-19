@@ -15,31 +15,36 @@ const KEY = '15674931-a9d714b6e9d654524df198e00&q';
 
 // show images 
 const showImages = (images) => {
-  imagesArea.style.display = 'block';
-  gallery.innerHTML = '';
-  // show gallery title
-  galleryHeader.style.display = 'flex';
-  images.forEach(image => {
-    let div = document.createElement('div');
-    div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
-    div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
-    gallery.appendChild(div);
-    toggleSpinner();
-  })
-
+  if (images.length == 0) {
+    document.getElementById('error-message').innerText = 'Image not found';
+  } else if (images.length > 0) {
+    document.getElementById('error-message').innerText = '';
+    imagesArea.style.display = 'block';
+    gallery.innerHTML = '';
+    // show gallery title
+    galleryHeader.style.display = 'flex';
+    images.forEach(image => {
+      let div = document.createElement('div');
+      div.className = 'col-lg-3 col-md-4 col-xs-6 img-item mb-2';
+      div.innerHTML = ` <img class="img-fluid img-thumbnail" onclick=selectItem(event,"${image.webformatURL}") src="${image.webformatURL}" alt="${image.tags}">`;
+      gallery.appendChild(div);
+    })
+  }
+  toggleSpinner();
 }
 
 const getImages = (query) => {
+  toggleSpinner();
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
     .then(data => showImages(data.hits))
-    .catch(err => displayError('Oops! Something went wrong'))
+    .catch(err => console.log(err))
 }
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
-  element.classList.add('added');
+  element.classList.toggle('added');
  
   let item = sliders.indexOf(img);
   if (item === -1) {
@@ -85,7 +90,7 @@ const createSlider = () => {
   timer = setInterval(function () {
     slideIndex++;
     changeSlide(slideIndex);
-  }, duration);
+  }, duration || 1000);
 }
 
 // change slider index 
@@ -127,21 +132,13 @@ sliderBtn.addEventListener('click', function () {
 })
 
 
-document.getElementById('search')
-    .addEventListener('keypress', function(event) {
-        if (event.key == 'Enter') {
-            document.getElementById('search-btn').click();
-        }
-    })
-
-  const toggleSpinner = (show) => {
-    const spinner = document.getElementById('loading-spinner');
-    const gallery = document.getElementById('gallery');
-    spinner.classList.toggle('d-none');
-    gallery.classList.toggle('d-none');
+document.getElementById('search').addEventListener('keypress', function(event) {
+  if (event.key == 'Enter') {
+      document.getElementById('search-btn').click();
   }
+})
 
-  const displayError = err => {
-    const errorTag = document.getElementById('error-message');
-    errorTag.innerText = err;
-  }
+const toggleSpinner = (show) => {
+  document.getElementById('loading-spinner').classList.toggle('d-none');
+  document.getElementById('gallery').classList.toggle('d-none');
+}
